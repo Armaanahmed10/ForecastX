@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ForecastX Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Orbitron', sans-serif; background: linear-gradient(135deg, #0a0e27 0%, #1a1a2e 100%); color: #e0e0e0; overflow-x: hidden; }
+.app-container { display: flex; min-height: 100vh; }
+
+/* ===== Welcome Page ===== */
+#welcome-page {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  background: linear-gradient(135deg, #0a0e27 0%, #1a1a2e 100%);
+  z-index: 9999; text-align: center;
+  transition: opacity 1s ease;
+}
+#welcome-page.hidden { opacity: 0; pointer-events: none; }
+.welcome-logo { width: 180px; height: auto; margin-bottom: 20px; }
+.welcome-title { font-size: 36px; color: #00ffff; margin-bottom: 15px; }
+.welcome-sub { font-size: 16px; color: #a0a0a0; margin-bottom: 30px; }
+.get-started-btn {
+  padding: 12px 30px; font-size: 16px; color: #0a0e27;
+  background: linear-gradient(135deg, #00ffff, #00bfff);
+  border: none; border-radius: 8px; cursor: pointer;
+  font-weight: bold; transition: 0.3s;
+}
+.get-started-btn:hover { transform: scale(1.05); background: #00cccc; }
+
+/* ===== Login Page ===== */
+#login-page {
+  position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+  display: none; align-items: center; justify-content: center; flex-direction: column;
+  background: linear-gradient(135deg, #0a0e27 0%, #1a1a2e 100%);
+  z-index: 9998; text-align: center;
+}
+.login-card {
+  background: rgba(26,26,46,0.9);
+  border: 1px solid rgba(0,255,255,0.3);
+  border-radius: 16px;
+  padding: 40px;
+  box-shadow: 0 0 20px rgba(0,255,255,0.2);
+}
+.login-card h2 { color: #00ffff; margin-bottom: 25px; }
+.login-input {
+  display: block; width: 250px; padding: 10px;
+  margin: 10px auto; border: none; border-radius: 6px;
+  background: rgba(255,255,255,0.1); color: #fff;
+  font-family: 'Roboto', sans-serif;
+}
+.login-btn {
+  padding: 10px 25px; background: #00ffff; border: none;
+  border-radius: 8px; cursor: pointer; color: #0a0e27;
+  font-weight: bold; transition: 0.3s;
+}
+.login-btn:hover { background: #00cccc; }
+.error-msg { color: #ff5555; margin-top: 10px; display: none; }
+
+/* ===== Dashboard Styling (truncated for brevity but same as yours) ===== */
+.sidebar { width: 240px; background: rgba(10,14,39,0.95); border-right: 1px solid rgba(0,255,255,0.2); position: fixed; height: 100vh; overflow-y: auto; padding: 0; }
+.logo { display: flex; justify-content: center; align-items: center; padding: 20px 0; cursor: pointer; transition: transform 0.3s ease, box-shadow 0.3s ease; }
+.logo:hover { transform: scale(1.1); box-shadow: 0 4px 15px rgba(0,255,255,0.3); }
+.logo-image { height: 150px; width: auto; object-fit: contain; display: block; }
+.nav-section { padding: 20px 0; }
+.nav-item { display: flex; align-items: center; padding: 12px 15px; margin: 5px 20px; border-radius: 8px; cursor: pointer; transition: all 0.3s ease; color: #a0a0a0; }
+.nav-item:hover { background: rgba(0,255,255,0.1); color: #00ffff; }
+.nav-item.active { background: linear-gradient(90deg, rgba(0,255,255,0.2) 0%, rgba(0,191,255,0.1) 100%); color: #00ffff; border-left: 3px solid #00ffff; }
+.main-content { margin-left: 240px; flex: 1; padding: 20px 30px; }
+.header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; padding-bottom: 20px; border-bottom: 1px solid rgba(0,255,255,0.2); }
+.header-tabs { display: flex; gap: 30px; }
+.header-tab { color: #a0a0a0; cursor: pointer; padding: 8px 0; border-bottom: 2px solid transparent; transition: all 0.3s ease; }
+.header-tab.active { color: #00ffff; border-bottom-color: #00ffff; }
+.user-profile { width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg,#00ffff 0%,#00bfff 100%); display: flex; align-items: center; justify-content: center; cursor: pointer; color: #0a0e27; font-weight: bold; }
+.page { display: none; }
+#dashboard.page { display: block; }
+
+/* ===== Animations ===== */
+.fade-in { animation: fadeIn 1s ease forwards; }
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+</style>
+</head>
+<body>
+
+<!-- Welcome Page -->
+<div id="welcome-page">
+  <img src="logo_no_bg - Edited.png" class="welcome-logo" alt="ForecastX Logo">
+  <div class="welcome-title">Welcome to ForecastX</div>
+  <div class="welcome-sub">AI-powered forecasting and insights platform.</div>
+  <button class="get-started-btn" id="getStartedBtn">Get Started</button>
+</div>
+
+<!-- Login Page -->
+<div id="login-page">
+  <div class="login-card fade-in">
+    <h2>Demo Login</h2>
+    <input type="text" id="username" class="login-input" placeholder="Username" />
+    <input type="password" id="password" class="login-input" placeholder="Password" />
+    <button id="loginBtn" class="login-btn">Login</button>
+    <div class="error-msg" id="errorMsg">Invalid credentials. Try demo/1234.</div>
+  </div>
+</div>
+    
+   <!-- Dashboard Container with iframe (hidden by default) -->
+<div class="app-container" id="dashboard-container" style="display:none;">
+  <iframe 
+    src="dashboard.html" 
+    style="width:100%; height:100vh; border:none; border-radius:12px;">
+  </iframe>
+</div>
+
+
+
+<script>
+// ===== Welcome → Login Transition =====
+document.getElementById('getStartedBtn').addEventListener('click', () => {
+  const welcome = document.getElementById('welcome-page');
+  welcome.classList.add('hidden');
+  setTimeout(() => {
+    welcome.style.display = 'none';
+    document.getElementById('login-page').style.display = 'flex';
+  }, 800);
+});
+
+// ===== Login Logic =====
+document.getElementById('loginBtn').addEventListener('click', () => {
+  const user = document.getElementById('username').value.trim();
+  const pass = document.getElementById('password').value.trim();
+  const error = document.getElementById('errorMsg');
+  if (user === 'demo' && pass === '1234') {
+    document.getElementById('login-page').style.display = 'none';
+    document.getElementById('dashboard-container').style.display = 'flex';
+    // No need to call loadChart() since it's inside the iframe
+  } else {
+    error.style.display = 'block';
+  }
+});
+
+// ===== Simple Chart.js Example =====
+function loadChart() {
+  const ctx = document.getElementById('demandChart').getContext('2d');
+  new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+      datasets: [{
+        label: 'Predicted Demand',
+        data: [120, 190, 150, 210, 180, 230, 200],
+        borderColor: '#00ffff',
+        backgroundColor: 'rgba(0,255,255,0.1)',
+        tension: 0.4
+      }]
+    },
+    options: {
+      plugins: { legend: { labels: { color: '#e0e0e0' } } },
+      scales: {
+        x: { ticks: { color: '#a0a0a0' } },
+        y: { ticks: { color: '#a0a0a0' } }
+      }
+    }
+  });
+}
+</script>
+</body>
+</html>
