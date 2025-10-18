@@ -124,6 +124,33 @@ body { font-family: 'Orbitron', sans-serif; background: linear-gradient(135deg, 
   border-color: #00ffff;
   box-shadow: 0 6px 20px rgba(0,255,255,0.2);
 }
+/* ===== Custom Alert Box ===== */
+.custom-alert {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(10, 14, 39, 0.95);
+  color: #00ffff;
+  border: 1px solid #00ffff;
+  box-shadow: 0 0 20px #00ffff;
+  padding: 20px 40px;
+  border-radius: 12px;
+  text-align: center;
+  font-size: 1.1em;
+  display: none;
+  z-index: 9999;
+  animation: fadeInOut 3s ease-in-out;
+}
+
+/* Fade Animation */
+@keyframes fadeInOut {
+  0% { opacity: 0; transform: translate(-50%, -60%); }
+  10% { opacity: 1; transform: translate(-50%, -50%); }
+  90% { opacity: 1; transform: translate(-50%, -50%); }
+  100% { opacity: 0; transform: translate(-50%, -40%); }
+}
+
 .integration-title {
   font-size: 18px;
   font-weight: 600;
@@ -404,8 +431,8 @@ canvas { max-height:300px; }
             <img src="logo_no_bg - Edited.png" alt="ForecastX Logo" class="logo-image">
         </div>
         <div class="nav-section">
-            <div class="nav-item" data-page="overview"><span class="nav-icon">📊</span><span>Overview</span></div>
             <div class="nav-item active" data-page="dashboard"><span class="nav-icon">📦</span><span>Stock Levels</span></div>
+            <div class="nav-item" data-page="overview"><span class="nav-icon">📊</span><span>Overview</span></div>
             <div class="nav-item" data-page="reports"><span class="nav-icon">📈</span><span>Reports</span></div>
         </div>
     </div>
@@ -423,24 +450,69 @@ canvas { max-height:300px; }
             <div class="user-profile">U</div>
         </div>
 
-          <!-- Upload Your Data -->
-          <div class="integration-card">
-            <div class="integration-title">Upload Your Data</div>
-            <p>Upload your CSV file to generate forecasts or custom insights.</p>
-            <input type="file" id="fileUpload" accept=".csv" style="margin-top:10px; color:#fff;">
-            <button id="uploadBtn" style="background:#00ffff;color:#0a0e27;padding:10px 20px;border:none;border-radius:8px;cursor:pointer;margin-top:10px;">Upload Data</button>
-            <p id="uploadStatus" style="margin-top:10px;color:#00ffff;"></p>
-          </div>
-
-        <!-- Buttons Row -->
-        <div style="display:flex; justify-content:center; gap:15px; margin-bottom:30px;">
-          <button class="action-btn" id="btnCleanData">Clean Data</button>
-          <button class="action-btn" id="btnActualData">Actual Data</button>
-          <button class="action-btn" id="btnPredictData">Predict Data</button>
-        </div>
-
         <!-- Pages -->
-        <div id="dashboard" class="page">
+         <!-- Stock Levels (Dashboard Page) -->
+<div id="dashboard" class="page">
+    <!-- Upload + Buttons -->
+    <div class="integration-card" style="margin-bottom: 25px;">
+        <div class="integration-title">Upload Your Data</div>
+        <p>Upload your CSV file to clean, analyze, and forecast your stock levels.</p>
+        <input type="file" id="fileUpload" accept=".csv" style="margin-top:10px; color:#fff;">
+        <button id="uploadBtn" class="action-btn" style="margin-top:10px;">Upload Data</button>
+        <p id="uploadStatus" style="margin-top:10px;color:#00ffff;"></p>
+    </div>
+
+    <!-- Buttons Row -->
+    <div style="display:flex; justify-content:center; gap:15px; margin-bottom:30px;">
+        <button class="action-btn" id="btnCleanData">Clean Data</button>
+        <button class="action-btn" id="btnActualData">Actual Data</button>
+        <button class="action-btn" id="btnPredictData">Predict Data</button>
+    </div>
+
+    <!-- Custom Alert Box -->
+    <div id="customAlert" class="custom-alert">
+        <p id="alertMessage"></p>
+    </div>
+
+    <!-- Metrics Grid -->
+    <div class="metrics-grid">
+        <div class="metric-card"><div class="metric-icon">🎯</div><div class="metric-value" id="accuracy">98%</div><div class="metric-label">Prediction Accuracy</div><div class="metric-sublabel">(Last 30 Days)</div></div>
+        <div class="metric-card"><div class="metric-icon">💰</div><div class="metric-label">Reduced Waste:</div><div class="metric-value" id="waste">$15,000</div></div>
+        <div class="metric-card"><div class="metric-icon">🛒</div><div class="metric-label">Increased Sales:</div><div class="metric-value" id="sales">+7%</div></div>
+        <div class="metric-card"><div class="metric-icon">😊</div><div class="metric-label">Customer Satisfaction:</div><div class="metric-value" id="satisfaction">4.8/5</div></div>
+    </div>
+
+    <!-- Charts -->
+    <div class="dashboard-row">
+        <div class="chart-container">
+            <div class="chart-title">Demand Forecast (Next 7 Days)</div>
+            <div class="chart-subtitle">Key Factors: Social Media Trends, Weather, Holiday</div>
+            <canvas id="demandChart"></canvas>
+        </div>
+        <div class="chart-container">
+            <div class="chart-title">Current Stock Levels & Alerts</div>
+            <table class="stock-table">
+                <thead><tr><th>Product</th><th>Recommended Order</th><th>Status</th></tr></thead>
+                <tbody id="stockTable">
+                    <tr><td>T-Shirts</td><td>500 → 150</td><td><span class="status-badge status-warning">Low Stock ⚠️</span></td></tr>
+                    <tr><td>Jeans</td><td>1200 → 0</td><td><span class="status-badge status-danger">Reorder Soon ⚠️</span></td></tr>
+                    <tr><td>Dresses</td><td>300 → 200</td><td>Normal</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Performance -->
+    <div class="dashboard-row">
+        <div class="chart-container performance-container">
+            <div class="chart-title">Performance Trends</div>
+            <div class="algorithm-status">● Learning & Improvement Algorithm v2.1 active</div>
+            <canvas id="performanceChart"></canvas>
+        </div>
+    </div>
+</div>
+
+         <div id="dashboard" class="page">
             <div class="metrics-grid">
                 <div class="metric-card"><div class="metric-icon">🎯</div><div class="metric-value" id="accuracy">98%</div><div class="metric-label">Prediction Accuracy</div><div class="metric-sublabel">(Last 30 Days)</div></div>
                 <div class="metric-card"><div class="metric-icon">💰</div><div class="metric-label">Reduced Waste:</div><div class="metric-value" id="waste">$15,000</div></div>
@@ -597,6 +669,43 @@ headerTabs.forEach(tab => {
         showPage(tab.dataset.page);
     });
 });
+
+// ===== Handle CSV Upload =====
+document.getElementById("uploadBtn").addEventListener("click", () => {
+  const fileInput = document.getElementById("fileUpload");
+  const uploadStatus = document.getElementById("uploadStatus");
+
+  if (!fileInput.files.length) {
+    showAlert("⚠️ Please select a CSV file before uploading.");
+    return;
+  }
+
+  const file = fileInput.files[0];
+  uploadStatus.textContent = "Uploading...";
+  uploadStatus.style.color = "#00ffff";
+
+  // Simulated upload delay
+  setTimeout(() => {
+    uploadStatus.textContent = "✅ File successfully uploaded!";
+    uploadStatus.style.color = "#00ff99";
+
+    showAlert("✅ File successfully uploaded.<br>Click <b>‘Predict Data’</b> on Dashboard to generate forecast.");
+  }, 1500);
+});
+
+// ===== Show Custom Alert =====
+function showAlert(message) {
+  const alertBox = document.getElementById("customAlert");
+  const alertMessage = document.getElementById("alertMessage");
+  
+  alertMessage.innerHTML = message;
+  alertBox.style.display = "block";
+  
+  // Hide automatically after 3 seconds
+  setTimeout(() => {
+    alertBox.style.display = "none";
+  }, 3000);
+}
 
 // ===== Button Click Handlers =====
 document.getElementById('btnCleanData').addEventListener('click', () => {
