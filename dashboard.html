@@ -1,658 +1,874 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ForecastX Dashboard</title>
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<style>
-/* ===== General Styles ===== */
-* { margin: 0; padding: 0; box-sizing: border-box; }
-body { font-family: 'Orbitron', sans-serif; background: linear-gradient(135deg, #0a0e27 0%, #1a1a2e 100%); color: #e0e0e0; overflow-x: hidden; }
-.app-container { display: flex; min-height: 100vh; }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ForecastX Dashboard</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&family=Roboto:wght@400;500;700&display=swap"
+    rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box
+    }
 
-/* ===== Sidebar ===== */
+    body {
+      font-family: 'Orbitron', sans-serif;
+      background: linear-gradient(135deg, #0a0e27 0%, #1a1a2e 100%);
+      color: #e0e0e0;
+      overflow-x: hidden
+    }
 
-.sidebar {
-  width: 240px;
-  background: rgba(10,14,39,0.95);
-  border-right: 1px solid rgba(0,255,255,0.2);
-  position: fixed;
-  height: 100vh;
-  overflow-y: auto;
-  padding: 0;
-}
+    .app-container {
+      display: flex;
+      min-height: 100vh
+    }
 
-.logo {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 20px 0; /* space above and below logo */
-  cursor: pointer; /* pointer on hover */
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
+    .sidebar {
+      width: 240px;
+      background: rgba(10, 14, 39, .95);
+      border-right: 1px solid rgba(0, 255, 255, .2);
+      position: fixed;
+      height: 100vh;
+      overflow-y: auto;
+      padding: 0
+    }
 
-.logo:hover {
-  transform: scale(1.1);
-  box-shadow: 0 4px 15px rgba(0,255,255,0.3);
-}
+    .logo {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px 0;
+      cursor: pointer;
+      transition: transform .3s ease, box-shadow .3s ease
+    }
 
-.logo:active {
-  transform: scale(0.97);
-  box-shadow: 0 0 10px rgba(0,255,255,0.2);
-}
+    .logo:hover {
+      transform: scale(1.1);
+      box-shadow: 0 4px 15px rgba(0, 255, 255, .3)
+    }
 
+    .logo:active {
+      transform: scale(.97);
+      box-shadow: 0 0 10px rgba(0, 255, 255, .2)
+    }
 
-.logo-image {
-  height: 150px;
-  width: auto;
-  object-fit: contain;
-  display: block;
-}
+    .logo-image {
+      height: 150px;
+      width: auto;
+      object-fit: contain;
+      display: block
+    }
 
-.nav-section {
-  padding: 20px 0;
-}
+    .nav-section {
+      padding: 20px 0
+    }
 
-.nav-item { 
-  display: flex; 
-  align-items: center; 
-  padding: 12px 15px; 
-  margin: 5px 20px; 
-  border-radius: 8px; 
-  cursor: pointer; 
-  transition: all 0.3s ease; 
-  color: #a0a0a0; 
-}
-.nav-item:hover { background: rgba(0,255,255,0.1); color: #00ffff; }
-.nav-item.active { background: linear-gradient(90deg, rgba(0,255,255,0.2) 0%, rgba(0,191,255,0.1) 100%); color: #00ffff; border-left: 3px solid #00ffff; }
-.nav-icon { margin-right: 12px; font-size: 18px; }
+    .nav-item {
+      display: flex;
+      align-items: center;
+      padding: 12px 15px;
+      margin: 5px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all .3s ease;
+      color: #a0a0a0
+    }
 
-/* ===== Main Content ===== */
-.main-content { margin-left: 240px; flex: 1; padding: 20px 30px; }
-.header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; padding-bottom: 20px; border-bottom: 1px solid rgba(0,255,255,0.2); }
-.header-tabs { display: flex; gap: 30px; }
-.header-tab { color: #a0a0a0; cursor: pointer; padding: 8px 0; border-bottom: 2px solid transparent; transition: all 0.3s ease; }
-.header-tab.active { color: #00ffff; border-bottom-color: #00ffff; }
-.user-profile { width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg,#00ffff 0%,#00bfff 100%); display: flex; align-items: center; justify-content: center; cursor: pointer; color: #0a0e27; font-weight: bold; }
+    .nav-item:hover {
+      background: rgba(0, 255, 255, .1);
+      color: #00ffff
+    }
 
-/* ===== Reports Styling ===== */
-.report-card {
-  background: rgba(26,26,46,0.8);
-  border: 1px solid rgba(0,255,255,0.2);
-  border-radius: 12px;
-  padding: 25px;
-  margin-bottom: 25px;
-  transition: all 0.3s ease;
-}
-.report-card:hover {
-  transform: translateY(-4px);
-  border-color: #00ffff;
-  box-shadow: 0 6px 20px rgba(0,255,255,0.2);
-}
-.report-title {
-  font-size: 18px;
-  font-weight: 600;
-  color: #00ffff;
-  margin-bottom: 12px;
-}
-.report-card ul {
-  list-style: none;
-  padding-left: 0;
-  margin-top: 10px;
-}
-.report-card li {
-  padding: 6px 0;
-  color: #e0e0e0;
-  border-left: 3px solid rgba(0,255,255,0.1);
-  padding-left: 10px;
-}
+    .nav-item.active {
+      background: linear-gradient(90deg, rgba(0, 255, 255, .2) 0%, rgba(0, 191, 255, .1) 100%);
+      color: #00ffff;
+      border-left: 3px solid #00ffff
+    }
 
-/* ===== Integrations Styling ===== */
-.integration-card {
-  background: rgba(26,26,46,0.8);
-  border: 1px solid rgba(0,255,255,0.2);
-  border-radius: 12px;
-  padding: 25px;
-  margin-bottom: 25px;
-  transition: all 0.3s ease;
-}
-.integration-card:hover {
-  transform: translateY(-4px);
-  border-color: #00ffff;
-  box-shadow: 0 6px 20px rgba(0,255,255,0.2);
-}
-/* ===== Custom Alert Box ===== */
-.custom-alert {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background: rgba(10, 14, 39, 0.95);
-  color: #00ffff;
-  border: 1px solid #00ffff;
-  box-shadow: 0 0 20px #00ffff;
-  padding: 20px 40px;
-  border-radius: 12px;
-  text-align: center;
-  font-size: 1.1em;
-  display: none;
-  z-index: 9999;
-  animation: fadeInOut 3s ease-in-out;
-}
+    .nav-icon {
+      margin-right: 12px;
+      font-size: 18px
+    }
 
-/* Fade Animation */
-@keyframes fadeInOut {
-  0% { opacity: 0; transform: translate(-50%, -60%); }
-  10% { opacity: 1; transform: translate(-50%, -50%); }
-  90% { opacity: 1; transform: translate(-50%, -50%); }
-  100% { opacity: 0; transform: translate(-50%, -40%); }
-}
+    .main-content {
+      margin-left: 240px;
+      flex: 1;
+      padding: 20px 30px
+    }
 
-.integration-title {
-  font-size: 18px;
-  font-weight: 600;
-  color: #00ffff;
-  margin-bottom: 10px;
-}
-.integration-card ul {
-  list-style: none;
-  line-height: 1.8;
-  color: #e0e0e0;
-  padding-left: 0;
-}
-.integration-card button {
-  background: #00ffff;
-  color: #0a0e27;
-  padding: 10px 18px;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: 600;
-  transition: 0.3s ease;
-}
-.integration-card button:hover {
-  background: #00cccc;
-  transform: translateY(-2px);
-}
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid rgba(0, 255, 255, .2)
+    }
 
-/* ===== Settings Styling ===== */
-.setting-card {
-  background: rgba(26,26,46,0.8);
-  border: 1px solid rgba(0,255,255,0.2);
-  border-radius: 12px;
-  padding: 25px;
-  margin-bottom: 25px;
-  transition: all 0.3s ease;
-}
-.setting-card:hover {
-  transform: translateY(-4px);
-  border-color: #00ffff;
-  box-shadow: 0 6px 20px rgba(0,255,255,0.2);
-}
-.setting-title {
-  font-size: 18px;
-  font-weight: 600;
-  color: #00ffff;
-  margin-bottom: 12px;
-}
-.setting-card p {
-  margin: 10px 0;
-  color: #e0e0e0;
-}
-.setting-card select,
-.setting-card input[type="checkbox"] {
-  background: rgba(255,255,255,0.05);
-  color: #fff;
-  border: 1px solid rgba(0,255,255,0.3);
-  border-radius: 6px;
-  padding: 5px 10px;
-  margin-left: 5px;
-}
-.setting-card button {
-  background: #00ffff;
-  color: #0a0e27;
-  padding: 8px 15px;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: 600;
-  transition: all 0.3s ease;
-}
-.setting-card button:hover {
-  background: #00cccc;
-  transform: translateY(-2px);
-}
+    .header-tabs {
+      display: flex;
+      gap: 30px
+    }
 
-/* ===== Responsive Adjustments ===== */
-@media (max-width: 768px) {
-  .report-card, .integration-card, .setting-card {
-    padding: 15px;
-    margin-bottom: 15px;
-  }
-  .report-title, .integration-title, .setting-title {
-    font-size: 16px;
-  }
-}
+    .header-tab {
+      color: #a0a0a0;
+      cursor: pointer;
+      padding: 8px 0;
+      border-bottom: 2px solid transparent;
+      transition: all .3s ease
+    }
 
-/* === Chatbot Styles === */
-.chatbot-container {
-  position: fixed;
-  bottom: 30px;
-  right: 30px;
-  z-index: 9999;
-}
+    .header-tab.active {
+      color: #00ffff;
+      border-bottom-color: #00ffff
+    }
 
-.chatbot-button {
-  width: 60px;
-  height: 60px;
-  background: linear-gradient(135deg, #00ffff, #00bfff);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 28px;
-  color: #0a0e27;
-  cursor: pointer;
-  box-shadow: 0 0 15px rgba(0, 255, 255, 0.5);
-  transition: all 0.3s ease;
-}
+    .user-profile {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #00ffff 0%, #00bfff 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: #0a0e27;
+      font-weight: bold
+    }
 
-.chatbot-button:hover {
-  transform: scale(1.1);
-}
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: #7f8c8d
+    }
 
-.chatbox {
-  position: absolute;
-  bottom: 80px;
-  right: 0;
-  width: 320px;
-  height: 420px;
-  background: rgba(26, 26, 46, 0.95);
-  border: 1px solid rgba(0, 255, 255, 0.3);
-  border-radius: 16px;
-  font-family: 'Roboto', sans-serif;
-  display: none;
-  flex-direction: column;
-  box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
-}
+    .empty-state-icon {
+      font-size: 64px;
+      margin-bottom: 20px;
+      opacity: .5
+    }
 
-.chatbox-header {
-  background: linear-gradient(135deg, rgba(0,255,255,0.2), rgba(0,191,255,0.1));
-  border-bottom: 1px solid rgba(0,255,255,0.3);
-  padding: 10px;
-  color: #00ffff;
-  font-weight: 600;
-  text-align: center;
-  border-top-left-radius: 16px;
-  border-top-right-radius: 16px;
-}
+    .empty-state-title {
+      font-size: 20px;
+      color: #00ffff;
+      margin-bottom: 10px
+    }
 
-.chatbox-messages {
-  flex: 1;
-  padding: 10px;
-  overflow-y: auto;
-  color: #e0e0e0;
-  font-size: 14px;
-}
+    .empty-state-text {
+      font-size: 14px;
+      color: #a0a0a0;
+      line-height: 1.6
+    }
 
-.chatbox-input {
-  display: flex;
-  padding: 10px;
-  border-top: 1px solid rgba(0,255,255,0.2);
-}
+    .hidden {
+      display: none
+    }
 
-.chatbox-input input {
-  flex: 1;
-  padding: 8px;
-  border: none;
-  border-radius: 8px;
-  outline: none;
-  background: rgba(255,255,255,0.1);
-  color: #e0e0e0;
-}
+    .report-card,
+    .integration-card,
+    .setting-card {
+      background: rgba(26, 26, 46, .8);
+      border: 1px solid rgba(0, 255, 255, .2);
+      border-radius: 12px;
+      padding: 25px;
+      margin-bottom: 25px;
+      transition: all .3s ease
+    }
 
-.chatbox-input button {
-  margin-left: 8px;
-  padding: 8px 12px;
-  background: #00ffff;
-  border: none;
-  border-radius: 8px;
-  color: #0a0e27;
-  font-weight: bold;
-  cursor: pointer;
-  transition: 0.3s;
-}
+    .report-card:hover,
+    .integration-card:hover,
+    .setting-card:hover {
+      transform: translateY(-4px);
+      border-color: #00ffff;
+      box-shadow: 0 6px 20px rgba(0, 255, 255, .2)
+    }
 
-.action-btn {
-  padding: 12px 25px;
-  font-size: 16px;
-  color: #0a0e27;
-  background: #00ffff;color:#0a0e27;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: bold;
-  transition: 0.3s;
-}
-.action-btn:hover {
-  transform: scale(1.05);
-  background: linear-gradient(135deg, #00cccc, #0099ff);
-}
+    .report-title,
+    .integration-title,
+    .setting-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: #00ffff;
+      margin-bottom: 12px
+    }
 
-.chatbox-input button:hover {
-  background: linear-gradient(135deg, #00cccc, #0099ff);
-}
+    .report-card ul,
+    .integration-card ul {
+      list-style: none;
+      padding-left: 0;
+      margin-top: 10px
+    }
 
-.message {
-  margin-bottom: 10px;
-  padding: 8px 12px;
-  border-radius: 10px;
-  max-width: 85%;
-  line-height: 1.4;
-}
+    .report-card li {
+      padding: 6px 0;
+      color: #e0e0e0;
+      border-left: 3px solid rgba(0, 255, 255, .1);
+      padding-left: 10px
+    }
 
-.user-message {
-  background: rgba(0,255,255,0.15);
-  align-self: flex-end;
-}
+    .integration-card ul {
+      line-height: 1.8;
+      color: #e0e0e0
+    }
 
-.bot-message {
-  background: rgba(255,255,255,0.08);
-  align-self: flex-start;
-}
+    .integration-card button,
+    .setting-card button {
+      background: #00ffff;
+      color: #0a0e27;
+      padding: 10px 18px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: .3s ease
+    }
 
-.typing {
-  font-style: italic;
-  color: #00ffff;
-}
+    .integration-card button:hover,
+    .setting-card button:hover {
+      background: #00cccc;
+      transform: translateY(-2px)
+    }
 
-/* === Responsive (Mobile View) === */
-@media (max-width: 768px) {
-  .chatbox {
-    width: 90vw;
-    height: 60vh;
-    bottom: 70px;
-    right: 5vw;
-  }
-}
+    .custom-alert {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(10, 14, 39, .95);
+      color: #00ffff;
+      border: 1px solid #00ffff;
+      box-shadow: 0 0 20px #00ffff;
+      padding: 20px 40px;
+      border-radius: 12px;
+      text-align: center;
+      font-size: 1.1em;
+      display: none;
+      z-index: 9999;
+      animation: fadeInOut 3s ease-in-out
+    }
 
-/* ===== Banner ===== */
-.welcome-banner { background: linear-gradient(135deg, rgba(0,255,255,0.1)0%, rgba(0,191,255,0.05)100%); border:1px solid rgba(0,255,255,0.3); border-radius:12px; padding:20px 25px; margin-bottom:25px; }
-.welcome-text { font-size:18px; color:#e0e0e0; }
+    @keyframes fadeInOut {
+      0% {
+        opacity: 0;
+        transform: translate(-50%, -60%)
+      }
 
-/* ===== Metrics Grid ===== */
-.metrics-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(250px,1fr)); gap:20px; margin-bottom:30px; }
-.metric-card { background:rgba(26,26,46,0.8); border:1px solid rgba(0,255,255,0.2); border-radius:12px; padding:25px; transition:all 0.3s ease; }
-.metric-card:hover { transform:translateY(-5px); border-color:#00ffff; box-shadow:0 8px 25px rgba(0,255,255,0.2); }
-.metric-icon { font-size:32px; margin-bottom:15px; color:#00ffff; }
-.metric-value { font-size:36px; font-weight:bold; color:#00ffff; margin-bottom:5px; }
-.metric-label { font-size:14px; color:#a0a0a0; margin-bottom:5px; }
-.metric-sublabel { font-size:12px; color:#808080; }
+      10% {
+        opacity: 1;
+        transform: translate(-50%, -50%)
+      }
 
-/* ===== Charts ===== */
-.dashboard-row { display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-bottom:30px; }
-.chart-container { background:rgba(26,26,46,0.8); border:1px solid rgba(0,255,255,0.2); border-radius:12px; padding:25px; }
-.chart-title { font-size:18px; font-weight:600; color:#e0e0e0; margin-bottom:20px; }
-.chart-subtitle { font-size:12px; color:#808080; margin-bottom:20px; }
+      90% {
+        opacity: 1;
+        transform: translate(-50%, -50%)
+      }
 
-/* ===== Tables ===== */
-.stock-table { width:100%; border-collapse:collapse; }
-.stock-table th { text-align:left; padding:12px; border-bottom:2px solid rgba(0,255,255,0.3); color:#a0a0a0; font-weight:500; font-size:13px; }
-.stock-table td { padding:15px 12px; border-bottom:1px solid rgba(0,255,255,0.1); color:#e0e0e0; }
-.stock-table tr:hover { background: rgba(0,255,255,0.05); }
-.status-badge { display:inline-flex; align-items:center; padding:5px 12px; border-radius:15px; font-size:12px; font-weight:500; }
-.status-warning { background:rgba(255,165,0,0.2); color:#ffa500; }
-.status-danger { background:rgba(255,69,0,0.2); color:#ff4500; }
+      100% {
+        opacity: 0;
+        transform: translate(-50%, -40%)
+      }
+    }
 
-/* ===== Performance ===== */
-.performance-container { grid-column:1/-1; }
-.algorithm-status { display:inline-block; padding:6px 12px; background:rgba(0,255,255,0.1); border:1px solid rgba(0,255,255,0.3); border-radius:20px; font-size:12px; color:#00ffff; margin-bottom:20px; }
-canvas { max-height:300px; }
+    .setting-card p {
+      margin: 10px 0;
+      color: #e0e0e0
+    }
 
-/* ===== Responsive ===== */
-@media (max-width:1024px){.dashboard-row{grid-template-columns:1fr;}}
-@media (max-width:768px){
-.sidebar{width:70px;}
-.main-content{margin-left:70px;}
-.nav-item span{display:none;}
-.metrics-grid{grid-template-columns:1fr;}
-}
-</style>
+    .setting-card select,
+    .setting-card input[type="checkbox"] {
+      background: rgba(255, 255, 255, .05);
+      color: #fff;
+      border: 1px solid rgba(0, 255, 255, .3);
+      border-radius: 6px;
+      padding: 5px 10px;
+      margin-left: 5px
+    }
+
+    .chatbot-container {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      z-index: 9999
+    }
+
+    .chatbot-button {
+      width: 60px;
+      height: 60px;
+      background: linear-gradient(135deg, #00ffff, #00bfff);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      color: #0a0e27;
+      cursor: pointer;
+      box-shadow: 0 0 15px rgba(0, 255, 255, .5);
+      transition: all .3s ease
+    }
+
+    .chatbot-button:hover {
+      transform: scale(1.1)
+    }
+
+    .chatbox {
+      position: absolute;
+      bottom: 80px;
+      right: 0;
+      width: 320px;
+      height: 420px;
+      background: rgba(26, 26, 46, .95);
+      border: 1px solid rgba(0, 255, 255, .3);
+      border-radius: 16px;
+      font-family: 'Roboto', sans-serif;
+      display: none;
+      flex-direction: column;
+      box-shadow: 0 0 20px rgba(0, 255, 255, .3)
+    }
+
+    .chatbox-header {
+      background: linear-gradient(135deg, rgba(0, 255, 255, .2), rgba(0, 191, 255, .1));
+      border-bottom: 1px solid rgba(0, 255, 255, .3);
+      padding: 10px;
+      color: #00ffff;
+      font-weight: 600;
+      text-align: center;
+      border-top-left-radius: 16px;
+      border-top-right-radius: 16px
+    }
+
+    .chatbox-messages {
+      flex: 1;
+      padding: 10px;
+      overflow-y: auto;
+      color: #e0e0e0;
+      font-size: 14px
+    }
+
+    .chatbox-input {
+      display: flex;
+      padding: 10px;
+      border-top: 1px solid rgba(0, 255, 255, .2)
+    }
+
+    .chatbox-input input {
+      flex: 1;
+      padding: 8px;
+      border: none;
+      border-radius: 8px;
+      outline: none;
+      background: rgba(255, 255, 255, .1);
+      color: #e0e0e0
+    }
+
+    .chatbox-input button {
+      margin-left: 8px;
+      padding: 8px 12px;
+      background: #00ffff;
+      border: none;
+      border-radius: 8px;
+      color: #0a0e27;
+      font-weight: bold;
+      cursor: pointer;
+      transition: .3s
+    }
+
+    .chatbox-input button:hover,
+    .action-btn:hover {
+      background: linear-gradient(135deg, #00cccc, #0099ff)
+    }
+
+    .action-btn {
+      padding: 12px 25px;
+      font-size: 16px;
+      color: #0a0e27;
+      background: #00ffff;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: .3s
+    }
+
+    .action-btn:hover {
+      transform: scale(1.05)
+    }
+
+    .message {
+      margin-bottom: 10px;
+      padding: 8px 12px;
+      border-radius: 10px;
+      max-width: 85%;
+      line-height: 1.4
+    }
+
+    .user-message {
+      background: rgba(0, 255, 255, .15);
+      align-self: flex-end
+    }
+
+    .bot-message {
+      background: rgba(255, 255, 255, .08);
+      align-self: flex-start
+    }
+
+    .typing {
+      font-style: italic;
+      color: #00ffff
+    }
+
+    .welcome-banner {
+      background: linear-gradient(135deg, rgba(0, 255, 255, .1)0%, rgba(0, 191, 255, .05)100%);
+      border: 1px solid rgba(0, 255, 255, .3);
+      border-radius: 12px;
+      padding: 20px 25px;
+      margin-bottom: 25px
+    }
+
+    .welcome-text {
+      font-size: 18px;
+      color: #e0e0e0
+    }
+
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+      margin-bottom: 30px
+    }
+
+    .metric-card {
+      background: rgba(26, 26, 46, .8);
+      border: 1px solid rgba(0, 255, 255, .2);
+      border-radius: 12px;
+      padding: 25px;
+      transition: all .3s ease;
+      min-height: 150px
+    }
+
+    .metric-card:hover {
+      transform: translateY(-5px);
+      border-color: #00ffff;
+      box-shadow: 0 8px 25px rgba(0, 255, 255, .2)
+    }
+
+    .metric-icon {
+      font-size: 32px;
+      margin-bottom: 15px;
+      color: #00ffff
+    }
+
+    .metric-value {
+      font-size: 36px;
+      font-weight: bold;
+      color: #00ffff;
+      margin-bottom: 5px
+    }
+
+    .metric-label {
+      font-size: 14px;
+      color: #a0a0a0;
+      margin-bottom: 5px
+    }
+
+    .metric-sublabel {
+      font-size: 12px;
+      color: #808080
+    }
+
+    .dashboard-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-bottom: 30px
+    }
+
+    .chart-container {
+      background: rgba(26, 26, 46, .8);
+      border: 1px solid rgba(0, 255, 255, .2);
+      border-radius: 12px;
+      padding: 25px;
+      min-height: 350px;
+      position: relative
+    }
+
+    .chart-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: #e0e0e0;
+      margin-bottom: 20px
+    }
+
+    .chart-subtitle {
+      font-size: 12px;
+      color: #808080;
+      margin-bottom: 20px
+    }
+
+    .stock-table {
+      width: 100%;
+      border-collapse: collapse
+    }
+
+    .stock-table th {
+      text-align: left;
+      padding: 12px;
+      border-bottom: 2px solid rgba(0, 255, 255, .3);
+      color: #a0a0a0;
+      font-weight: 500;
+      font-size: 13px
+    }
+
+    .stock-table td {
+      padding: 15px 12px;
+      border-bottom: 1px solid rgba(0, 255, 255, .1);
+      color: #e0e0e0
+    }
+
+    .stock-table tr:hover {
+      background: rgba(0, 255, 255, .05)
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 5px 12px;
+      border-radius: 15px;
+      font-size: 12px;
+      font-weight: 500
+    }
+
+    .status-warning {
+      background: rgba(255, 165, 0, .2);
+      color: #ffa500
+    }
+
+    .status-danger {
+      background: rgba(255, 69, 0, .2);
+      color: #ff4500
+    }
+
+    .performance-container {
+      grid-column: 1/-1
+    }
+
+    .algorithm-status {
+      display: inline-block;
+      padding: 6px 12px;
+      background: rgba(0, 255, 255, .1);
+      border: 1px solid rgba(0, 255, 255, .3);
+      border-radius: 20px;
+      font-size: 12px;
+      color: #00ffff;
+      margin-bottom: 20px
+    }
+
+    canvas {
+      max-height: 300px
+    }
+
+    @media (max-width:1024px) {
+      .dashboard-row {
+        grid-template-columns: 1fr
+      }
+    }
+
+    @media (max-width:768px) {
+      .sidebar {
+        width: 70px
+      }
+
+      .main-content {
+        margin-left: 70px
+      }
+
+      .nav-item span {
+        display: none
+      }
+
+      .metrics-grid {
+        grid-template-columns: 1fr
+      }
+
+      .chatbox {
+        width: 90vw;
+        height: 60vh;
+        bottom: 70px;
+        right: 5vw
+      }
+    }
+  </style>
 </head>
+
 <body>
-    
-<div class="app-container">
-    <!-- Sidebar -->
+  <div class="app-container">
     <div class="sidebar">
-        <div class="logo" id="logo">
-            <img src="logo_no_bg - Edited.png" alt="ForecastX Logo" class="logo-image">
+      <div class="logo" id="logo"><img src="logo_no_bg - Edited.png" alt="ForecastX Logo" class="logo-image"></div>
+      <div class="nav-section">
+        <div class="nav-item active" data-page="dashboard"><span class="nav-icon">📦</span><span>Stock Levels</span>
         </div>
-        <div class="nav-section">
-            <div class="nav-item active" data-page="dashboard"><span class="nav-icon">📦</span><span>Stock Levels</span></div>
-            <div class="nav-item" data-page="overview"><span class="nav-icon">📊</span><span>Overview</span></div>
-            <div class="nav-item" data-page="reports"><span class="nav-icon">📈</span><span>Reports</span></div>
-        </div>
+        <div class="nav-item" data-page="overview"><span class="nav-icon">📊</span><span>Overview</span></div>
+        <div class="nav-item" data-page="reports"><span class="nav-icon">📈</span><span>Reports</span></div>
+      </div>
     </div>
-
-    <!-- Main Content -->
     <div class="main-content">
-        <!-- Header -->
-        <div class="header">
-            <div class="header-tabs">
-                <div class="header-tab active" data-page="dashboard">Home</div>
-                <div class="header-tab" data-page="inventory">Inventory</div>
-                <div class="header-tab" data-page="analytics">Analytics</div>
-                <div class="header-tab" data-page="settings">Settings</div>
+      <div class="header">
+        <div class="header-tabs">
+          <div class="header-tab active" data-page="dashboard">Home</div>
+          <div class="header-tab" data-page="inventory">Inventory</div>
+          <div class="header-tab" data-page="analytics">Analytics</div>
+          <div class="header-tab" data-page="settings">Settings</div>
+        </div>
+        <div class="user-profile">U</div>
+      </div>
+      <div id="dashboard" class="page">
+        <div class="integration-card" style="margin-bottom:25px">
+          <div class="integration-title">Upload Your Data</div>
+          <p>Upload your CSV file to clean, analyze, and forecast your stock levels.</p>
+          <input type="file" id="fileUpload" accept=".csv" style="margin-top: 10px;
+          padding: 10px 15px;
+          border-radius: 8px;
+          border: 1px solid #00ffff;
+          background: rgba(0,255,255,0.1);
+          color: #00ffff;
+          font-family: 'Orbitron', sans-serif;
+          font-weight: 500;
+          cursor: pointer;
+          transition: all 0.3s ease;">
+          <button id="uploadBtn" class="action-btn" style="margin-top:10px">Upload Data</button>
+          <p id="uploadStatus" style="margin-top:10px;color:#00ffff"></p>
+        </div>
+        <div style="display:flex;justify-content:center;gap:15px;margin-bottom:30px">
+          <button class="action-btn" id="btnAnalyzeData">Analyse Data</button>
+          <button class="action-btn hidden" id="btnCleanData">Clean Data</button>
+          <button class="action-btn hidden" id="btnPredictData">Predict Data</button>
+        </div>
+        <div id="customAlert" class="custom-alert">
+          <p id="alertMessage"></p>
+        </div>
+        <div class="metrics-grid">
+          <div class="metric-card">
+            <div id="understockMetric" class="empty-state">
+              <div class="empty-state-icon">🎯</div>
+              <div class="empty-state-title">Understock</div>
+              <div class="empty-state-text">Data will appear after prediction</div>
             </div>
-            <div class="user-profile">U</div>
-        </div>
-
-        <!-- Pages -->
-         <!-- Stock Levels (Dashboard Page) -->
-<div id="dashboard" class="page">
-    <!-- Upload + Buttons -->
-    <div class="integration-card" style="margin-bottom: 25px;">
-        <div class="integration-title">Upload Your Data</div>
-        <p>Upload your CSV file to clean, analyze, and forecast your stock levels.</p>
-        <input type="file" id="fileUpload" accept=".csv" style="margin-top:10px; color:#fff;">
-        <button id="uploadBtn" class="action-btn" style="margin-top:10px;">Upload Data</button>
-        <p id="uploadStatus" style="margin-top:10px;color:#00ffff;"></p>
-    </div>
-
-    <!-- Buttons Row -->
-    <div style="display:flex; justify-content:center; gap:15px; margin-bottom:30px;">
-        <button class="action-btn" id="btnCleanData">Clean Data</button>
-        <button class="action-btn" id="btnActualData">Actual Data</button>
-        <button class="action-btn" id="btnPredictData">Predict Data</button>
-    </div>
-
-    <!-- Custom Alert Box -->
-    <div id="customAlert" class="custom-alert">
-        <p id="alertMessage"></p>
-    </div>
-
-    <!-- Metrics Grid -->
-    <div class="metrics-grid">
-        <div class="metric-card"><div class="metric-icon">🎯</div><div class="metric-value" id="accuracy">98%</div><div class="metric-label">Prediction Accuracy</div><div class="metric-sublabel">(Last 30 Days)</div></div>
-        <div class="metric-card"><div class="metric-icon">💰</div><div class="metric-label">Reduced Waste:</div><div class="metric-value" id="waste">$15,000</div></div>
-        <div class="metric-card"><div class="metric-icon">🛒</div><div class="metric-label">Increased Sales:</div><div class="metric-value" id="sales">+7%</div></div>
-        <div class="metric-card"><div class="metric-icon">😊</div><div class="metric-label">Customer Satisfaction:</div><div class="metric-value" id="satisfaction">4.8/5</div></div>
-    </div>
-
-    <!-- Charts -->
-    <div class="dashboard-row">
-        <div class="chart-container">
-            <div class="chart-title">Demand Forecast (Next 7 Days)</div>
-            <div class="chart-subtitle">Key Factors: Social Media Trends, Weather, Holiday</div>
-            <canvas id="demandChart"></canvas>
-        </div>
-        <div class="chart-container">
-            <div class="chart-title">Current Stock Levels & Alerts</div>
-            <table class="stock-table">
-                <thead><tr><th>Product</th><th>Recommended Order</th><th>Status</th></tr></thead>
-                <tbody id="stockTable">
-                    <tr><td>T-Shirts</td><td>500 → 150</td><td><span class="status-badge status-warning">Low Stock ⚠️</span></td></tr>
-                    <tr><td>Jeans</td><td>1200 → 0</td><td><span class="status-badge status-danger">Reorder Soon ⚠️</span></td></tr>
-                    <tr><td>Dresses</td><td>300 → 200</td><td>Normal</td></tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
-
-    <!-- Performance -->
-    <div class="dashboard-row">
-        <div class="chart-container performance-container">
-            <div class="chart-title">Performance Trends</div>
-            <div class="algorithm-status">● Learning & Improvement Algorithm v2.1 active</div>
-            <canvas id="performanceChart"></canvas>
-        </div>
-    </div>
-</div>
-
-         <div id="dashboard" class="page">
-            <div class="metrics-grid">
-                <div class="metric-card"><div class="metric-icon">🎯</div><div class="metric-value" id="accuracy">98%</div><div class="metric-label">Prediction Accuracy</div><div class="metric-sublabel">(Last 30 Days)</div></div>
-                <div class="metric-card"><div class="metric-icon">💰</div><div class="metric-label">Reduced Waste:</div><div class="metric-value" id="waste">$15,000</div></div>
-                <div class="metric-card"><div class="metric-icon">🛒</div><div class="metric-label">Increased Sales:</div><div class="metric-value" id="sales">+7%</div></div>
-                <div class="metric-card"><div class="metric-icon">😊</div><div class="metric-label">Customer Satisfaction:</div><div class="metric-value" id="satisfaction">4.8/5</div></div>
+            <div id="understockData" class="hidden">
+              <div class="metric-icon">🎯</div>
+              <div class="metric-value" id="understock">--</div>
+              <div class="metric-label">Understock</div>
             </div>
-            <div class="dashboard-row">
-                <div class="chart-container"><div class="chart-title">Demand Forecast (Next 7 Days)</div><div class="chart-subtitle">Key Factors: Social Media Trends, Weather, Holiday</div><canvas id="demandChart"></canvas></div>
-                <div class="chart-container">
-                    <div class="chart-title">Current Stock Levels & Alerts</div>
-                    <table class="stock-table">
-                        <thead><tr><th>Product</th><th>Recommended Order</th><th>Status</th></tr></thead>
-                        <tbody id="stockTable">
-                            <tr><td>T-Shirts</td><td>500 → 150</td><td><span class="status-badge status-warning">Low Stock ⚠️</span></td></tr>
-                            <tr><td>Jeans</td><td>1200 → 0</td><td><span class="status-badge status-danger">Reorder Soon ⚠️</span></td></tr>
-                            <tr><td>Dresses</td><td>300 → 200</td><td>Normal</td></tr>
-                        </tbody>
-                    </table>
-                </div>
+          </div>
+          <div class="metric-card">
+            <div id="overstockMetric" class="empty-state">
+              <div class="empty-state-icon">📦</div>
+              <div class="empty-state-title">Overstock</div>
+              <div class="empty-state-text">Data will appear after prediction</div>
             </div>
-            <div class="dashboard-row">
-                <div class="chart-container performance-container"><div class="chart-title">Performance Trends</div><div class="algorithm-status">● Learning & Improvement Algorithm v2.1 active</div><canvas id="performanceChart"></canvas></div>
+            <div id="overstockData" class="hidden">
+              <div class="metric-icon">📦</div>
+              <div class="metric-value" id="overstock">--</div>
+              <div class="metric-label">Overstock</div>
             </div>
-        </div>
-
-        <div id="overview" class="page" style="display:none;">
-            <div class="welcome-banner"><div class="welcome-text">Overview: Quick Insights at a Glance.</div></div>
-            <div class="metrics-grid">
-                <div class="metric-card"><div class="metric-icon">📈</div><div class="metric-value">75%</div><div class="metric-label">Sales Growth</div><div class="metric-sublabel">(Last Month)</div></div>
-                <div class="metric-card"><div class="metric-icon">📦</div><div class="metric-value">1200</div><div class="metric-label">Active Products</div></div>
-                <div class="metric-card"><div class="metric-icon">👥</div><div class="metric-value">320</div><div class="metric-label">New Customers</div></div>
+          </div>
+          <div class="metric-card">
+            <div id="salesMetric" class="empty-state">
+              <div class="empty-state-icon">🛒</div>
+              <div class="empty-state-title">Increased Sales</div>
+              <div class="empty-state-text">Data will appear after prediction</div>
             </div>
-        </div>
-
-        <div id="inventory" class="page" style="display:none;">
-            <div class="chart-container">
-                <div class="chart-title">Inventory Overview</div>
-                <canvas id="inventoryChart"></canvas>
-            </div>
-        </div>
-
-        <div id="analytics" class="page" style="display:none;">
-            <div class="chart-container">
-                <div class="chart-title">Analytics Dashboard</div>
-                <canvas id="analyticsChart"></canvas>
-            </div>
-        </div>
-        
-        <!-- Reports -->
-        <div id="reports" class="page" style="display:none;">
-        <div class="report-card">
-            <div class="report-title">Sales Performance Report</div>
-            <p>AI-generated insights comparing actual vs forecasted performance across categories.</p>
-            <canvas id="reportChart"></canvas>
-            </div>
-
-        <div class="report-card">
-            <div class="report-title">Summary Insights</div>
-            <ul>
-            <li>📈 Weekly demand up by <b>8%</b> due to promotional campaigns.</li>
-            <li>📦 Inventory turnover ratio improved to <b>4.2</b>.</li>
-            <li>💰 Forecasted cost savings: <b>$12,000</b> this quarter.</li>
-            <li>🛍️ Top-selling category: <b>Footwear</b> (+15% growth).</li>
-            <li>⚠️ Underperforming segment: <b>Accessories</b> (-5%).</li>
-            </ul>
-        </div>
-        </div>
-
-        <!-- Integrations -->
-        <div id="integrations" class="page" style="display:none;">
-        <div class="integration-card">
-            <div class="integration-title">Connected APIs</div>
-            <ul>
-            <li>🧠 AI Forecast Engine — <span style="color:#00ffff;">Active</span></li>
-            <li>📦 Inventory Database Sync — <span style="color:#00ffff;">Connected</span></li>
-            <li>💬 Slack Notifications — <span style="color:#ffa500;">Pending</span></li>
-            <li>📊 Google Sheets Export — <span style="color:#ff5555;">Disconnected</span></li>
-            </ul>
-        </div>
-
-        <div class="integration-card">
-            <div class="integration-title">Add New Integration</div>
-            <p>Connect your dashboard with third-party tools like Shopify, Google Analytics, or your internal ERP system to automate forecasting pipelines.</p>
-            <button style="background:#00ffff;color:#0a0e27;padding:10px 20px;border:none;border-radius:8px;cursor:pointer;">+ Add Integration</button>
-        </div>
-
-        <div class="integration-card">
-            <div class="integration-title">Integration Logs</div>
-            <p>Last Sync: <b>October 16, 2025 - 09:45 AM</b></p>
-            <p>Status: <span style="color:#00ffff;">All active systems operational ✅</span></p>
-        </div>
-        </div>
-
-        <!-- Settings -->
-        <div id="settings" class="page" style="display:none;">
-        <div class="setting-card">
-            <div class="setting-title">User Preferences</div>
-           
-            <p>Notifications: <input type="checkbox" checked> Enable email alerts</p>
-            <p>Data Refresh Interval:
-            <select>
-                <option>Every 15 minutes</option>
-                <option>Hourly</option>
-                <option>Daily</option>
-            </select>
-            </p>
-        </div>
-
-        <div class="setting-card">
-            <div class="setting-title">System Configuration</div>
-            <p>AI Model Version: <b>v2.3.1</b></p>
-            <p>Auto-Update: <input type="checkbox" checked> Enabled</p>
-            <p>Data Source: <b>Retail-Fashion-Boutique-Analytics.csv</b></p>
-            <p>Backup: <button style="background:#00ffff;color:#0a0e27;padding:8px 15px;border:none;border-radius:6px;cursor:pointer;">Create Backup</button></p>
-        </div>
-
-        <div class="setting-card">
-            <div class="setting-title">Account Management</div>
-            <p>Logged in as: <b>[User Name]</b></p>
-            <p>Email: <b>user@example.com</b></p>
-            <button style="background:#ff5555;color:#fff;padding:8px 15px;border:none;border-radius:6px;cursor:pointer;">Logout</button>
-        </div>
-        </div>
-
-       <!-- === Floating Chatbot === -->
-        <div id="chatbot-container" class="chatbot-container">
-          <div id="chatbot-button" class="chatbot-button">🤖</div>
-          <div id="chatbox" class="chatbox">
-            <div class="chatbox-header">ForecastX Assistant</div>
-            <div id="chatbox-messages" class="chatbox-messages"></div>
-            <div class="chatbox-input">
-              <input type="text" id="userInput" placeholder="Type your message..." />
-              <button id="sendButton">Send</button>
+            <div id="salesData" class="hidden">
+              <div class="metric-icon">🛒</div>
+              <div class="metric-label">Increased Sales:</div>
+              <div class="metric-value" id="sales">--</div>
             </div>
           </div>
         </div>
+        <div class="dashboard-row">
+          <div class="chart-container">
+            <div class="chart-title">Demand Forecast (Next 7 Days)</div>
+            <div class="chart-subtitle">Key Factors: Social Media Trends, Weather, Holiday</div>
+            <canvas id="demandChart" class="hidden"></canvas>
+            <div id="demandEmpty" class="empty-state">
+              <div class="empty-state-icon">📈</div>
+              <div class="empty-state-title">No Forecast Data</div>
+              <div class="empty-state-text">Upload CSV and click "Predict Data" to see demand forecasts</div>
+            </div>
+          </div>
+          <div class="chart-container">
+            <div class="chart-title">Current Stock Levels & Alerts</div>
+            <table class="stock-table" id="stockTableContainer" class="hidden">
+              <thead>
+                <tr>
+                  <th>Product</th>
+                  <th>Optimal Stock</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="stockTable"></tbody>
+            </table>
+            <div id="stockEmpty" class="empty-state">
+              <div class="empty-state-icon">📋</div>
+              <div class="empty-state-title">No Stock Data</div>
+              <div class="empty-state-text">Stock levels and alerts will appear after prediction</div>
+            </div>
+          </div>
+        </div>
+        <div class="dashboard-row">
+          <div class="chart-container performance-container">
+            <div class="chart-title">Performance Trends</div>
+            <div class="algorithm-status hidden" id="algorithmStatus">● Learning & Improvement Algorithm v2.1 active
+            </div>
+            <canvas id="performanceChart" class="hidden"></canvas>
+            <div id="performanceEmpty" class="empty-state">
+              <div class="empty-state-icon">📊</div>
+              <div class="empty-state-title">No Performance Data</div>
+              <div class="empty-state-text">Performance trends will be displayed after running predictions</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id="overview" class="page" style="display:none">
+        <div class="welcome-banner">
+          <div class="welcome-text">Overview: Quick Insights at a Glance.</div>
+        </div>
+        <div class="metrics-grid">
+          <div class="metric-card">
+            <div id="salesGrowthMetric" class="empty-state">
+              <div class="empty-state-icon">📈</div>
+              <div class="empty-state-title">Sales Growth</div>
+              <div class="empty-state-text">Data will appear after prediction</div>
+            </div>
+            <div id="salesGrowthData" class="hidden">
+              <div class="metric-icon">📈</div>
+              <div class="metric-value" id="salesGrowth">--</div>
+              <div class="metric-label">Sales Growth</div>
+              <div class="metric-sublabel">(Last Month)</div>
+            </div>
+          </div>
+          <div class="metric-card">
+            <div id="activeProductsMetric" class="empty-state">
+              <div class="empty-state-icon">📦</div>
+              <div class="empty-state-title">Active Products</div>
+              <div class="empty-state-text">Data will appear after prediction</div>
+            </div>
+            <div id="activeProductsData" class="hidden">
+              <div class="metric-icon">📦</div>
+              <div class="metric-value" id="activeProducts">--</div>
+              <div class="metric-label">Active Products</div>
+            </div>
+          </div>
+          <div class="metric-card">
+            <div id="customersMetric" class="empty-state">
+              <div class="empty-state-icon">👥</div>
+              <div class="empty-state-title">New Customers</div>
+              <div class="empty-state-text">Data will appear after prediction</div>
+            </div>
+            <div id="customersData" class="hidden">
+              <div class="metric-icon">👥</div>
+              <div class="metric-value" id="newCustomers">--</div>
+              <div class="metric-label">New Customers</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id="inventory" class="page" style="display:none">
+        <div class="chart-container">
+          <div class="chart-title">Inventory Overview</div>
+          <canvas id="inventoryChart" class="hidden"></canvas>
+          <div id="inventoryEmpty" class="empty-state">
+            <div class="empty-state-icon">📦</div>
+            <div class="empty-state-title">No Inventory Data</div>
+            <div class="empty-state-text">Upload CSV and run predictions to see inventory analytics</div>
+          </div>
+        </div>
+      </div>
+      <div id="analytics" class="page" style="display:none">
+        <div class="chart-container">
+          <div class="chart-title">Analytics Dashboard</div>
+          <canvas id="analyticsChart" class="hidden"></canvas>
+          <div id="analyticsEmpty" class="empty-state">
+            <div class="empty-state-icon">📊</div>
+            <div class="empty-state-title">No Analytics Data</div>
+            <div class="empty-state-text">Analytics insights will be generated after prediction</div>
+          </div>
+        </div>
+      </div>
+      <div id="reports" class="page" style="display:none">
+        <div class="report-card">
+          <div class="report-title">Sales Performance Report</div>
+          <p>AI-generated insights comparing actual vs forecasted performance across categories.</p>
+          <canvas id="reportChart" class="hidden"></canvas>
+          <div id="reportEmpty" class="empty-state">
+            <div class="empty-state-icon">📈</div>
+            <div class="empty-state-title">No Report Data</div>
+            <div class="empty-state-text">Sales performance report will be generated after prediction</div>
+          </div>
+        </div>
+        <div class="report-card">
+          <div class="report-title">Summary Insights</div>
+          <div id="summaryInsights" class="empty-state">
+            <div class="empty-state-icon">📋</div>
+            <div class="empty-state-title">No Insights Available</div>
+            <div class="empty-state-text">Summary insights will appear after running predictions</div>
+          </div>
+          <ul id="insightsList" class="hidden"></ul>
+        </div>
+      </div>
+      <div id="settings" class="page" style="display:none">
+        <div class="setting-card">
+          <div class="setting-title">User Preferences</div>
+          <p>Notifications: <input type="checkbox" checked> Enable email alerts</p>
+          <p>Data Refresh Interval: <select>
+              <option>Every 15 minutes</option>
+              <option>Hourly</option>
+              <option>Daily</option>
+            </select></p>
+        </div>
+        <div class="setting-card">
+          <div class="setting-title">System Configuration</div>
+          <p>AI Model Version: <b>v2.3.1</b></p>
+          <p>Auto-Update: <input type="checkbox" checked> Enabled</p>
+          <p>Data Source: <b id="dataSource">No file uploaded</b></p>
+          <p>Backup: <button
+              style="background:#00ffff;color:#0a0e27;padding:8px 15px;border:none;border-radius:6px;cursor:pointer">Create
+              Backup</button></p>
+        </div>
+        <div class="setting-card">
+          <div class="setting-title">Account Management</div>
+          <p>Logged in as: <b>[User Name]</b></p>
+          <p>Email: <b>user@example.com</b></p>
+          <button
+            style="background:#ff5555;color:#fff;padding:8px 15px;border:none;border-radius:6px;cursor:pointer">Logout</button>
+        </div>
+      </div>
+    </div>
+    <div id="chatbot-container" class="chatbot-container">
+      <div id="chatbot-button" class="chatbot-button">🤖</div>
+      <div id="chatbox" class="chatbox">
+        <div class="chatbox-header">ForecastX Assistant</div>
+        <div id="chatbox-messages" class="chatbox-messages"></div>
+        <div class="chatbox-input"><input type="text" id="userInput" placeholder="Type your message..." /><button
+            id="sendButton">Send</button></div>
+      </div>
+    </div>
+  </div>
+  <script>
+   // ===== Global State =====
 
+let charts = {
+    demand: null,
+    performance: null,
+    inventory: null,
+    analytics: null,
+    report: null
+};
 
-<script>
-// === Tab & Page Switching ===
+// ===== Tab & Page Switching =====
 const headerTabs = document.querySelectorAll('.header-tab');
 const sidebarItems = document.querySelectorAll('.nav-item');
 const pages = document.querySelectorAll('.page');
@@ -670,56 +886,6 @@ headerTabs.forEach(tab => {
     });
 });
 
-// ===== Handle CSV Upload =====
-document.getElementById("uploadBtn").addEventListener("click", () => {
-  const fileInput = document.getElementById("fileUpload");
-  const uploadStatus = document.getElementById("uploadStatus");
-
-  if (!fileInput.files.length) {
-    showAlert("⚠️ Please select a CSV file before uploading.");
-    return;
-  }
-
-  const file = fileInput.files[0];
-  uploadStatus.textContent = "Uploading...";
-  uploadStatus.style.color = "#00ffff";
-
-  // Simulated upload delay
-  setTimeout(() => {
-    uploadStatus.textContent = "✅ File successfully uploaded!";
-    uploadStatus.style.color = "#00ff99";
-
-    showAlert("✅ File successfully uploaded.<br>Click <b>‘Predict Data’</b> on Dashboard to generate forecast.");
-  }, 1500);
-});
-
-// ===== Show Custom Alert =====
-function showAlert(message) {
-  const alertBox = document.getElementById("customAlert");
-  const alertMessage = document.getElementById("alertMessage");
-  
-  alertMessage.innerHTML = message;
-  alertBox.style.display = "block";
-  
-  // Hide automatically after 3 seconds
-  setTimeout(() => {
-    alertBox.style.display = "none";
-  }, 3000);
-}
-
-// ===== Button Click Handlers =====
-document.getElementById('btnCleanData').addEventListener('click', () => {
-  alert('Cleaning data...');
-});
-
-document.getElementById('btnActualData').addEventListener('click', () => {
-  alert('Showing actual data...');
-});
-
-document.getElementById('btnPredictData').addEventListener('click', () => {
-  alert('Predicting data...');
-});
-
 sidebarItems.forEach(item => {
     item.addEventListener('click', () => {
         sidebarItems.forEach(i => i.classList.remove('active'));
@@ -732,155 +898,492 @@ sidebarItems.forEach(item => {
 document.getElementById('logo').addEventListener('click', () => {
     sidebarItems.forEach(i => i.classList.remove('active'));
     document.querySelector('.nav-item[data-page="dashboard"]').classList.add('active');
-
     headerTabs.forEach(t => t.classList.remove('active'));
     document.querySelector('.header-tab[data-page="dashboard"]').classList.add('active');
-
     showPage('dashboard');
 });
 
 // Show dashboard by default
 showPage('dashboard');
 
-// ---------------- Charts ----------------
-let demandChart, performanceChart, inventoryChart, analyticsChart;
+// ===== Show Custom Alert =====
+function showAlert(message) {
+    const alertBox = document.getElementById("customAlert");
+    const alertMessage = document.getElementById("alertMessage");
+    alertMessage.innerHTML = message;
+    alertBox.style.display = "block";
+    setTimeout(() => {
+        alertBox.style.display = "none";
+    }, 3000);
+}
 
-async function loadForecastData() {
-    try {
-        const res = await fetch('http://127.0.0.1:5000/api/forecast');
-        const data = await res.json();
-        const forecast = data.forecast;
+const API_BASE = 'https://retail-ai-backend.onrender.com'
+    // ===== Handle CSV Upload =====
+    document.getElementById("uploadBtn").addEventListener("click", () => {
+      const fileInput = document.getElementById("fileUpload");
+      const uploadStatus = document.getElementById("uploadStatus");
 
-        const labels = forecast.map((d, i) => d.Week || `Item ${i+1}`);
-        const pastSales = forecast.map(d => d.PastSales || d.Sales);
-        const predicted = forecast.map(d => d.PredictedDemand);
+      if (!fileInput.files.length) {
+        showAlert("⚠️ Please select a CSV file before uploading.");
+        return;
+      }
 
-        // Update Demand Chart
-        const demandCtx = document.getElementById('demandChart').getContext('2d');
-        if (demandChart) demandChart.destroy();
-        demandChart = new Chart(demandCtx, {
-            type:'line',
-            data: {
-                labels,
-                datasets:[{
-                    label:'Predicted Demand',
-                    data: predicted,
-                    borderColor:'#00ffff',
-                    backgroundColor:'rgba(0,255,255,0.1)',
-                    tension:0.4,
-                    fill:true,
-                    pointRadius:4,
-                    pointBackgroundColor:'#00ffff'
-                }]
-            },
-            options:{
-                responsive:true,
-                maintainAspectRatio:true,
-                plugins:{legend:{display:false}},
-                scales:{
-                    y:{beginAtZero:true, grid:{color:'rgba(0,255,255,0.1)'}, ticks:{color:'#a0a0a0'}, title:{display:true,text:'Units',color:'#a0a0a0'}},
-                    x:{grid:{color:'rgba(0,255,255,0.1)'}, ticks:{color:'#a0a0a0'}}
+      const file = fileInput.files[0];
+      uploadStatus.textContent = "Uploading...";
+      uploadStatus.style.color = "#00ffff";
+
+      // Simulated upload delay
+      setTimeout(() => {
+        uploadStatus.textContent = "✅ File successfully uploaded!";
+        uploadStatus.style.color = "#00ff99";
+
+        showAlert("✅ File successfully uploaded.<br>Click <b>‘Predict Data’</b> on Dashboard to generate forecast.");
+      }, 1500);
+    });
+
+    // ===== Show Custom Alert =====
+    function showAlert(message) {
+      const alertBox = document.getElementById("customAlert");
+      const alertMessage = document.getElementById("alertMessage");
+
+      alertMessage.innerHTML = message;
+      alertBox.style.display = "block";
+
+      // Hide automatically after 3 seconds
+      setTimeout(() => {
+        alertBox.style.display = "none";
+      }, 3000);
+    }
+    // ===== Button Click Handlers =====
+    // Helper: POST selected CSV to backend path and return JSON
+    async function postSelectedCSV(path) {
+      const fileInput = document.getElementById('fileUpload');
+      if (!fileInput.files || !fileInput.files[0]) { showAlert('⚠️ Please select a CSV file first.'); throw new Error('no-file'); }
+      const file = fileInput.files[0];
+      const fd = new FormData(); fd.append('file', file);
+      const res = await fetch(`${API_BASE}${path}`, { method: 'POST', body: fd });
+      if (!res.ok) {
+        const txt = await res.text().catch(() => null);
+        throw new Error(`Request failed ${res.status} ${res.statusText}` + (txt ? `: ${txt}` : ''));
+      }
+      return await res.json().catch(() => ({}));
+    }
+
+    document.getElementById('btnAnalyzeData').addEventListener('click', async () => {
+      try {
+        showAlert('Analyzing data...');
+        const data = await postSelectedCSV('/api/analyze');
+        console.log('Analyze response:', data);
+
+        const msg = data.message || (data.summary && JSON.stringify(data.summary)) || 'Analysis completed';
+        showAlert(msg);
+
+        // ✅ Show Clean and Predict buttons only after analysis
+        document.getElementById('btnCleanData').classList.remove('hidden');
+        document.getElementById('btnPredictData').classList.remove('hidden');
+
+        // Optional: automatically focus the Predict button
+        document.getElementById('btnPredictData').scrollIntoView({ behavior: 'smooth' });
+
+        if (data.forecast || data.forecasts) updateUIFromForecast(data);
+      } catch (err) {
+        console.error(err);
+        showAlert('Analysis failed');
+      }
+    });
+
+    document.getElementById('btnCleanData').addEventListener('click', async () => {
+      try {
+        showAlert('Cleaning data...');
+        const data = await postSelectedCSV('/api/clean');
+        console.log('Clean response:', data);
+        if (data.cleaned) { console.table(data.cleaned.slice(0, 20)); showAlert(data.message || 'Clean completed (cleaned returned)'); }
+        else showAlert(data.message || (data.summary && JSON.stringify(data.summary)) || 'Clean completed');
+      } catch (err) { console.error(err); showAlert('Clean failed'); }
+    });
+
+    document.getElementById('btnPredictData').addEventListener('click', async () => {
+      try {
+        showAlert('Predicting data...');
+        const data = await postSelectedCSV('/api/predict');
+        console.log('Predict response:', data);
+        if (data.forecast || data.forecasts) { updateUIFromForecast(data); showAlert(data.message || 'Prediction completed'); }
+        else { await loadForecastData(); showAlert(data.message || 'Prediction completed (refreshed)'); }
+      } catch (err) { console.error(err); showAlert('Prediction failed'); }
+    });
+
+// ===== Update Dashboard with Backend Data =====
+function updateDashboard(data) {
+    // Update Dashboard Metrics
+    if (data.metrics) {
+        updateMetric('understock', data.metrics.understock || '0%', 'understockMetric', 'understockData');
+        updateMetric('overstock', data.metrics.overstock || '0%', 'overstockMetric', 'overstockData');
+        updateMetric('sales', data.metrics.sales || '+0%', 'salesMetric', 'salesData');
+    }
+    
+    // Update Overview Metrics
+    if (data.overview) {
+        updateMetric('salesGrowth', data.overview.salesGrowth || '0%', 'salesGrowthMetric', 'salesGrowthData');
+        updateMetric('activeProducts', data.overview.activeProducts || '0', 'activeProductsMetric', 'activeProductsData');
+        updateMetric('newCustomers', data.overview.newCustomers || '0', 'customersMetric', 'customersData');
+    }
+    
+    // Update Charts
+    if (data.forecast) {
+        createDemandChart(data.forecast);
+        createPerformanceChart(data.forecast);
+    }
+    
+    if (data.inventory) {
+        createInventoryChart(data.inventory);
+    }
+    
+    if (data.analytics) {
+        createAnalyticsChart(data.analytics);
+    }
+    
+    if (data.report) {
+        createReportChart(data.report);
+        updateSummaryInsights(data.report.insights);
+    }
+    
+    // Update Stock Table
+    if (data.stockLevels) {
+        updateStockTable(data.stockLevels);
+    }
+}
+
+// ===== Helper Function to Update Metrics =====
+function updateMetric(elementId, value, emptyId, dataId) {
+    document.getElementById(elementId).textContent = value;
+    document.getElementById(emptyId).classList.add('hidden');
+    document.getElementById(dataId).classList.remove('hidden');
+}
+
+// ===== Create Demand Chart (Line) =====
+function createDemandChart(data) {
+    const canvas = document.getElementById('demandChart');
+    const emptyState = document.getElementById('demandEmpty');
+    
+    canvas.classList.remove('hidden');
+    emptyState.classList.add('hidden');
+    
+    if (charts.demand) charts.demand.destroy();
+    
+    charts.demand = new Chart(canvas.getContext('2d'), {
+        type: 'line',
+        data: {
+            labels: data.labels || [],
+            datasets: [{
+                label: 'Predicted Demand',
+                data: data.predicted || [],
+                borderColor: '#00ffff',
+                backgroundColor: 'rgba(0,255,255,0.1)',
+                tension: 0.4,
+                fill: true,
+                pointRadius: 4,
+                pointBackgroundColor: '#00ffff'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: { legend: { display: true, labels: { color: '#a0a0a0' } } },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: { color: 'rgba(0,255,255,0.1)' },
+                    ticks: { color: '#a0a0a0' },
+                    title: { display: true, text: 'Units', color: '#a0a0a0' }
+                },
+                x: {
+                    grid: { color: 'rgba(0,255,255,0.1)' },
+                    ticks: { color: '#a0a0a0' }
                 }
             }
-        });
+        }
+    });
+}
 
-        // Update Performance Chart
-        const performanceCtx = document.getElementById('performanceChart').getContext('2d');
-        if (performanceChart) performanceChart.destroy();
-        performanceChart = new Chart(performanceCtx, {
-            type:'bar',
-            data:{
-                labels,
-                datasets:[
-                    { label:'Past Sales Data', data: pastSales, backgroundColor:'rgba(160,160,160,0.5)', borderColor:'rgba(160,160,160,0.8)', borderWidth:1 },
-                    { label:'AI-Predicted Demand', data: predicted, backgroundColor:'rgba(0,255,255,0.3)', borderColor:'#00ffff', borderWidth:1 }
-                ]
-            },
-            options:{
-                responsive:true,
-                maintainAspectRatio:true,
-                plugins:{legend:{display:true, labels:{color:'#a0a0a0'}}},
-                scales:{y:{beginAtZero:true, grid:{color:'rgba(0,255,255,0.1)'}, ticks:{color:'#a0a0a0'}}, x:{grid:{color:'rgba(0,255,255,0.1)'}, ticks:{color:'#a0a0a0'}}}
+// ===== Create Performance Chart (Bar + Line Combo) =====
+function createPerformanceChart(data) {
+    const canvas = document.getElementById('performanceChart');
+    const emptyState = document.getElementById('performanceEmpty');
+    const algorithmStatus = document.getElementById('algorithmStatus');
+    
+    canvas.classList.remove('hidden');
+    emptyState.classList.add('hidden');
+    algorithmStatus.classList.remove('hidden');
+    
+    if (charts.performance) charts.performance.destroy();
+    
+    charts.performance = new Chart(canvas.getContext('2d'), {
+        type: 'bar',
+        data: {
+            labels: data.labels || [],
+            datasets: [
+                {
+                    label: 'Past Sales Data',
+                    data: data.actual || [],
+                    backgroundColor: 'rgba(160,160,160,0.5)',
+                    borderColor: 'rgba(160,160,160,0.8)',
+                    borderWidth: 1
+                },
+                {
+                    label: 'AI-Predicted Demand',
+                    data: data.predicted || [],
+                    backgroundColor: 'rgba(0,255,255,0.3)',
+                    borderColor: '#00ffff',
+                    borderWidth: 1
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: { legend: { display: true, labels: { color: '#a0a0a0' } } },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: { color: 'rgba(0,255,255,0.1)' },
+                    ticks: { color: '#a0a0a0' }
+                },
+                x: {
+                    grid: { color: 'rgba(0,255,255,0.1)' },
+                    ticks: { color: '#a0a0a0' }
+                }
             }
-        });
-
-        // Update Inventory Chart
-        const inventoryCtx = document.getElementById('inventoryChart').getContext('2d');
-        if (inventoryChart) inventoryChart.destroy();
-        inventoryChart = new Chart(inventoryCtx, {
-            type:'bar',
-            data:{
-                labels,
-                datasets:[{label:'Quantity', data: pastSales, backgroundColor:'#00ffff'}]
-            },
-            options:{ responsive:true }
-        });
-
-        // Update Analytics Chart
-        const analyticsCtx = document.getElementById('analyticsChart').getContext('2d');
-        if (analyticsChart) analyticsChart.destroy();
-        analyticsChart = new Chart(analyticsCtx, {
-            type:'line',
-            data:{ labels, datasets:[{label:'Revenue', data: predicted, borderColor:'#00ffff', backgroundColor:'rgba(0,255,255,0.1)', fill:true}]},
-            options:{ responsive:true }
-        });
-
-        // Update stock table
-        const tableBody = document.getElementById('stockTable');
-        tableBody.innerHTML = '';
-        forecast.forEach(item => {
-            const status = item.PredictedDemand < 50 ? 
-                `<span class="status-badge status-danger">Reorder Soon ⚠️</span>` :
-                item.PredictedDemand < 150 ?
-                `<span class="status-badge status-warning">Low Stock ⚠️</span>` :
-                `Normal`;
-            tableBody.innerHTML += `<tr><td>${item.Product}</td><td>${item.Sales} → ${Math.round(item.PredictedDemand)}</td><td>${status}</td></tr>`;
-        });
-
-    } catch(err) {
-        console.error("Error loading forecast data:", err);
-    }
+        }
+    });
 }
 
-// ---------------- Metrics ----------------
-async function loadMetrics() {
-    try {
-        const res = await fetch('http://127.0.0.1:5000/api/metrics');
-        const data = await res.json();
-        document.getElementById('accuracy').innerText = data.accuracy + '%';
-        document.getElementById('waste').innerText = '$' + data.waste.toLocaleString();
-        document.getElementById('sales').innerText = '+' + data.sales + '%';
-        document.getElementById('satisfaction').innerText = data.satisfaction + '/5';
-    } catch(err) {
-        console.error("Error loading metrics:", err);
-    }
+// ===== Create Inventory Chart (Doughnut) =====
+function createInventoryChart(data) {
+    const canvas = document.getElementById('inventoryChart');
+    const emptyState = document.getElementById('inventoryEmpty');
+    
+    canvas.classList.remove('hidden');
+    emptyState.classList.add('hidden');
+    
+    if (charts.inventory) charts.inventory.destroy();
+    
+    charts.inventory = new Chart(canvas.getContext('2d'), {
+        type: 'doughnut',
+        data: {
+            labels: data.labels || [],
+            datasets: [{
+                data: data.values || [],
+                backgroundColor: ['#00ffff', '#00bfff', '#0099ff', '#0077ff', '#0055ff']
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                legend: {
+                    display: true,
+                    position: 'bottom',
+                    labels: { color: '#a0a0a0' }
+                }
+            }
+        }
+    });
 }
 
-// ---------------- CSV Upload ----------------
-document.getElementById('uploadBtn').addEventListener('click', async function() {
-    const fileInput = document.getElementById('fileUpload');
-    const file = fileInput.files[0];
-    if (!file) {
-        document.getElementById('uploadStatus').innerText = "⚠️ Please select a CSV file first.";
-        return;
-    }
-    const formData = new FormData();
-    formData.append("file", file);
+// ===== Create Analytics Chart (Line) =====
+function createAnalyticsChart(data) {
+    const canvas = document.getElementById('analyticsChart');
+    const emptyState = document.getElementById('analyticsEmpty');
+    
+    canvas.classList.remove('hidden');
+    emptyState.classList.add('hidden');
+    
+    if (charts.analytics) charts.analytics.destroy();
+    
+    charts.analytics = new Chart(canvas.getContext('2d'), {
+        type: 'line',
+        data: {
+            labels: data.labels || [],
+            datasets: [{
+                label: 'Revenue',
+                data: data.revenue || [],
+                borderColor: '#00ffff',
+                backgroundColor: 'rgba(0,255,255,0.1)',
+                fill: true,
+                tension: 0.4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: { legend: { display: true, labels: { color: '#a0a0a0' } } },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: { color: 'rgba(0,255,255,0.1)' },
+                    ticks: { color: '#a0a0a0' }
+                },
+                x: {
+                    grid: { color: 'rgba(0,255,255,0.1)' },
+                    ticks: { color: '#a0a0a0' }
+                }
+            }
+        }
+    });
+}
 
-    try {
-        const res = await fetch('http://127.0.0.1:5000/api/upload_csv', { method:'POST', body: formData });
-        const data = await res.json();
-        document.getElementById('uploadStatus').innerText = data.message;
-        // Refresh charts after upload
-        await loadForecastData();
-        await loadMetrics();
-    } catch(err) {
-        document.getElementById('uploadStatus').innerText = "⚠️ Upload failed.";
-        console.error(err);
-    }
-});
+// ===== Create Report Chart (Combo: Bar + Line) =====
+function createReportChart(data) {
+    const canvas = document.getElementById('reportChart');
+    const emptyState = document.getElementById('reportEmpty');
+    
+    canvas.classList.remove('hidden');
+    emptyState.classList.add('hidden');
+    
+    if (charts.report) charts.report.destroy();
+    
+    charts.report = new Chart(canvas.getContext('2d'), {
+        type: 'bar',
+        data: {
+            labels: data.labels || [],
+            datasets: [
+                {
+                    label: 'Actual Performance',
+                    data: data.actual || [],
+                    backgroundColor: 'rgba(0,255,255,0.5)',
+                    borderColor: '#00ffff',
+                    borderWidth: 1,
+                    order: 2
+                },
+                {
+                    label: 'Forecasted Performance',
+                    data: data.forecasted || [],
+                    type: 'line',
+                    borderColor: '#ff9500',
+                    borderWidth: 2,
+                    fill: false,
+                    tension: 0.4,
+                    order: 1
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: { legend: { display: true, labels: { color: '#a0a0a0' } } },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: { color: 'rgba(0,255,255,0.1)' },
+                    ticks: { color: '#a0a0a0' }
+                },
+                x: {
+                    grid: { color: 'rgba(0,255,255,0.1)' },
+                    ticks: { color: '#a0a0a0' }
+                }
+            }
+        }
+    });
+}
 
-// ---------------- Chatbot ----------------
+// ===== Update Stock Table =====
+function updateStockTable(stockLevels) {
+    const tableContainer = document.getElementById('stockTableContainer');
+    const stockTable = document.getElementById('stockTable');
+    const emptyState = document.getElementById('stockEmpty');
+    
+    tableContainer.classList.remove('hidden');
+    emptyState.classList.add('hidden');
+    
+    stockTable.innerHTML = '';
+    
+    stockLevels.forEach(item => {
+        let status = 'Normal';
+        let statusClass = '';
+        
+        if (item.status === 'low') {
+            status = '<span class="status-badge status-warning">Low Stock ⚠️</span>';
+        } else if (item.status === 'reorder') {
+            status = '<span class="status-badge status-danger">Reorder Soon ⚠️</span>';
+        }
+        
+        const row = `<tr>
+            <td>${item.product}</td>
+            <td>${item.current} → ${item.optimal}</td>
+            <td>${status}</td>
+        </tr>`;
+        
+        stockTable.innerHTML += row;
+    });
+}
+
+// ===== Update Summary Insights =====
+function updateSummaryInsights(insights) {
+    const emptyState = document.getElementById('summaryInsights');
+    const insightsList = document.getElementById('insightsList');
+    
+    if (!insights || insights.length === 0) return;
+    
+    emptyState.classList.add('hidden');
+    insightsList.classList.remove('hidden');
+    
+    insightsList.innerHTML = '';
+    insights.forEach(insight => {
+        const li = document.createElement('li');
+        li.innerHTML = insight;
+        insightsList.appendChild(li);
+    });
+}
+
+// ===== Generate Demo Data (For Testing) =====
+function generateDemoData() {
+    const demoData = {
+        metrics: {
+            understock: '12%',
+            overstock: '8%',
+            sales: '+7%'
+        },
+        overview: {
+            salesGrowth: '75%',
+            activeProducts: '1200',
+            newCustomers: '320'
+        },
+        forecast: {
+            labels: ['Day 1', 'Day 2', 'Day 3', 'Day 4', 'Day 5', 'Day 6', 'Day 7'],
+            actual: [120, 150, 140, 180, 160, 200, 190],
+            predicted: [130, 155, 145, 185, 170, 210, 200]
+        },
+        inventory: {
+            labels: ['Electronics', 'Clothing', 'Food', 'Books', 'Other'],
+            values: [30, 25, 20, 15, 10]
+        },
+        analytics: {
+            labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
+            revenue: [5000, 6500, 7200, 8100]
+        },
+        report: {
+            labels: ['Category A', 'Category B', 'Category C', 'Category D'],
+            actual: [500, 700, 600, 800],
+            forecasted: [550, 680, 650, 820],
+            insights: [
+                '📈 Weekly demand up by <b>8%</b> due to promotional campaigns.',
+                '📦 Inventory turnover ratio improved to <b>4.2</b>.',
+                '💰 Forecasted cost savings: <b>$12,000</b> this quarter.',
+                '🛍️ Top-selling category: <b>Footwear</b> (+15% growth).',
+                '⚠️ Underperforming segment: <b>Accessories</b> (-5%).'
+            ]
+        },
+        stockLevels: [
+            { product: 'T-Shirts', current: 500, optimal: 150, status: 'low' },
+            { product: 'Jeans', current: 1200, optimal: 0, status: 'reorder' },
+            { product: 'Dresses', current: 300, optimal: 200, status: 'normal' }
+        ]
+    };
+    
+    updateDashboard(demoData);
+}
+
+// ===== Chatbot Functionality =====
 const chatbotButton = document.getElementById('chatbot-button');
 const chatbox = document.getElementById('chatbox');
 const chatbotContainer = document.getElementById('chatbot-container');
@@ -913,18 +1416,19 @@ async function sendMessage() {
     showTypingAnimation();
 
     try {
-        const res = await fetch('http://127.0.0.1:5000/api/chatbot', {
-            method:'POST',
-            headers:{'Content-Type':'application/json'},
-            body: JSON.stringify({message})
+        const response = await fetch('http://127.0.0.1:5000/api/chatbot', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ message })
         });
-        const data = await res.json();
+        
+        const data = await response.json();
         removeTypingAnimation();
         addMessage(data.reply, 'bot');
-    } catch(err) {
+    } catch (error) {
         removeTypingAnimation();
-        addMessage("⚠️ Error connecting to server.", 'bot');
-        console.error(err);
+        addMessage("⚠️ Error connecting to chatbot server.", 'bot');
+        console.error(error);
     }
 }
 
@@ -949,12 +1453,6 @@ function removeTypingAnimation() {
     const typing = document.getElementById('typing');
     if (typing) typing.remove();
 }
-
-// ---------------- Initialize ----------------
-window.addEventListener('load', async () => {
-    await loadForecastData();
-    await loadMetrics();
-});
-</script>
+  </script>
 </body>
 </html>
