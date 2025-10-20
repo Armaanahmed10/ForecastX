@@ -581,7 +581,7 @@ async function sendMessage() {
     const data = await response.json();
     chatMessages.removeChild(typingDiv);
 
-    appendMessage(data.reply || "⚠️ No response from AI server.", "bot");
+    appendMessage(data.message || "⚠️ No response from AI server.", "bot");
   } catch (error) {
     chatMessages.removeChild(typingDiv);
     appendMessage("⚠️ Unable to connect to chatbot backend.", "bot");
@@ -592,3 +592,4 @@ async function sendMessage() {
   </script>
 </body>
 </html>
+
